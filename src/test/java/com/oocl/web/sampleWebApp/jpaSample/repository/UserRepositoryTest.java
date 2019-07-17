@@ -1,7 +1,6 @@
 package com.oocl.web.sampleWebApp.jpaSample.repository;
 
-import com.oocl.web.sampleWebApp.jpaSample.entity.User;
-import com.oocl.web.sampleWebApp.jpaSample.repository.UserRepository;
+import com.oocl.web.sampleWebApp.jpaSample.entity.SingleEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -18,21 +17,54 @@ import java.util.List;
 public class UserRepositoryTest {
 
   @Autowired
-  private UserRepository userRepository;
+  private SingleRepository userRepository;
 
   @Test
-  public void test_should_return_user_when_the_user_exist() {
+  public void test_should_return_single_when_the_single_exist() {
     //given
-    User user = new User();
-    user.setName("test");
-    userRepository.save(user);
+    SingleEntity singleEntity = new SingleEntity();
+    singleEntity.setName("test");
+    userRepository.save(singleEntity);
 
     //when
-    List<User> userList = userRepository.findAll();
+    List<SingleEntity> singleList = userRepository.findAll();
 
     //then
-    Assertions.assertEquals(1, userList.size());
-    Assertions.assertEquals("test", userList.get(0).getName());
+    Assertions.assertEquals(1, singleList.size());
+    Assertions.assertEquals("test", singleList.get(0).getName());
+  }
+
+  @Test
+  public void test_should_return_exception_when_the_name_smaller_than_64() {
+    //given
+    SingleEntity singleEntity = new SingleEntity();
+    String name = "";
+    for(int i=0;i<63;i++) {
+      name += "a";
+    }
+    singleEntity.setName(name);
+    userRepository.save(singleEntity);
+
+    //when
+    List<SingleEntity> singleList = userRepository.findAll();
+
+
+    userRepository.save(singleEntity);
+    Assertions.assertEquals(name, singleList.get(0).getName());
+  }
+
+  @Test
+  public void test_should_return_exception_when_the_name_larger_than_64() {
+    //given
+    SingleEntity singleEntity = new SingleEntity();
+    String name = "";
+    for(int i=0;i<65;i++) {
+      name += "a";
+    }
+
+    singleEntity.setName(name);
+    userRepository.save(singleEntity);
+    Assertions.assertThrows(Exception.class, ()->{userRepository.findAll();});
   }
 
 }
